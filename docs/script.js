@@ -27,7 +27,7 @@ document.addEventListener("mousemove", (event) => {
   mouseX = event.clientX;
   mouseY = event.clientY;
 
-  if (!touchMode && Date.now() - lastEscape > 90) {
+  if (!touchMode && Date.now() - lastEscape > 300) {
     const rect = noBtn.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
@@ -60,71 +60,46 @@ noBtn.addEventListener("click", (event) => {
   escapeButton();
 });
 
+let noOffsetX = 0;
+let noOffsetY = 0;
+
 function escapeButton() {
   const now = Date.now();
 
-  if (now - lastEscape < 90) return;
-  lastEscape = now;
+  if (now - lastEscape < 300) return;
 
+  lastEscape = now;
   escapeCount++;
 
-  const rect = noBtn.getBoundingClientRect();
+  const moveDistance = 75;
 
-  // Once it starts escaping, use viewport coordinates.
-  noBtn.classList.add("escaping");
+  const angle = Math.random() * Math.PI * 2;
 
-  const padding = 18;
-  const margin = 35;
+  noOffsetX += Math.cos(angle) * moveDistance;
+  noOffsetY += Math.sin(angle) * moveDistance;
 
-  const maxX = window.innerWidth - rect.width - padding;
-  const maxY = window.innerHeight - rect.height - padding;
+  // Evitar que se vaya demasiado lejos
+  noOffsetX = Math.max(-80, Math.min(80, noOffsetX));
+  noOffsetY = Math.max(-50, Math.min(50, noOffsetY));
 
-  let newX;
-  let newY;
+  noBtn.style.transform =
+    `translate(${noOffsetX}px, ${noOffsetY}px)`;
 
-  // Try several positions and choose one sufficiently far from the cursor.
-  for (let attempt = 0; attempt < 30; attempt++) {
-    newX = random(padding, Math.max(padding, maxX));
-    newY = random(padding, Math.max(padding, maxY));
+  const messageIndex = Math.min(
+    escapeCount,
+    messages.length - 1
+  );
 
-    const distanceFromMouse = Math.hypot(
-      newX + rect.width / 2 - mouseX,
-      newY + rect.height / 2 - mouseY
-    );
-
-    const distanceFromYes = distanceToElement(
-      newX,
-      newY,
-      rect.width,
-      rect.height,
-      yesBtn
-    );
-
-    if (
-      distanceFromMouse > 150 &&
-      distanceFromYes > margin
-    ) {
-      break;
-    }
-  }
-
-  noBtn.style.left = `${newX}px`;
-  noBtn.style.top = `${newY}px`;
-
-  noBtn.classList.remove("teleport");
-  void noBtn.offsetWidth;
-  noBtn.classList.add("teleport");
-
-  const messageIndex = Math.min(escapeCount, messages.length - 1);
   hint.textContent = messages[messageIndex];
 
-  // After several attempts, make the joke explicit.
   if (escapeCount === 6) {
-    hint.textContent = "Creo que ya entendiste cómo funciona esto. 😂";
+    hint.textContent =
+      "Creo que ya entendiste cómo funciona esto. 😂";
   }
 
   if (escapeCount >= 10) {
-    hint.textContent = "Aceptémoslo: la única respuesta razonable es la otra. 🚀";
+    hint.textContent =
+      "Aceptémoslo: la única respuesta razonable es la otra. 🚀";
   }
 }
 
