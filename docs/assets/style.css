@@ -361,14 +361,8 @@ footer {
 
 /* Button escape animation */
 .btn-no.escaping {
-  position: fixed;
-  transition:
-    left 300ms ease,
-    top 300ms ease;
-}
-
-.btn-no.teleport {
-  animation: teleport 160ms ease-out;
+  position: relative;
+  transition: transform 250ms ease;
 }
 
 @keyframes cardIn {
@@ -396,12 +390,6 @@ footer {
 @keyframes blink {
   0%, 80%, 100% { opacity: .25; transform: scale(.8); }
   40% { opacity: 1; transform: scale(1.2); }
-}
-
-@keyframes teleport {
-  0% { transform: scale(1); opacity: 1; }
-  45% { transform: scale(.82); opacity: .45; }
-  100% { transform: scale(1); opacity: 1; }
 }
 
 @keyframes successIn {
