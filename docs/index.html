@@ -1,42 +1,96 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pregunta Capciosa</title>
-    <link rel="stylesheet" href="assets/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#08090d">
+  <title>Una pregunta para BluePixel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+  <div class="noise"></div>
+  <div class="orb orb-one"></div>
+  <div class="orb orb-two"></div>
 
-    <h1>¿Aceptas que tengo la razón en todo?</h1>
+  <main class="page">
+    <section class="card" id="card">
+      <div class="topline">
+        <span class="status-dot"></span>
+        <span>one small question</span>
+      </div>
 
-    <div class="container">
-        <button id="btn-si" onclick="responderSi()">SÍ</button>
-        <button id="btn-no" onmouseover="moverBoton()" onclick="moverBoton()">NO</button>
-    </div>
+      <div class="content">
+        <p class="eyebrow">GENARO - BLUEPIXEL · 2026</p>
 
-    <script>
-        function moverBoton() {
-            const botonNo = document.getElementById('btn-no');
-            
-            // Calcula posiciones aleatorias dentro del área visible de la pantalla
-            const x = Math.random() * (window.innerWidth - botonNo.offsetWidth - 20);
-            const y = Math.random() * (window.innerHeight - botonNo.offsetHeight - 20);
-            
-            // Cambia la posición del botón de forma inmediata
-            botonNo.style.left = x + 'px';
-            botonNo.style.top = y + 'px';
-        }
+        <h1>
+          <span class="accent">¡</span>Hola, Genaro<span class="accent">!</span>
+        </h1>
 
-        function responderSi() {
-            alert('¡Sabía que ibas a estar de acuerdo! 😉');
-        }
-    </script>
+        <p class="intro">
+          Hace unas semanas tuvimos nuestra entrevista técnica
+          y quería preguntarte algo...
+        </p>
 
+        <div class="pause" id="pause">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <div class="question-wrap" id="questionWrap">
+          <h2>¿Será que puedo<br><em>colaborar con ustedes?</em></h2>
+
+          <div class="buttons-area" id="buttonsArea">
+            <button class="btn btn-yes" id="yesBtn" type="button">
+              <span>🌟 ¡Sí, ya vente! 🌟</span>
+              <span class="arrow">↗</span>
+            </button>
+
+            <button class="btn btn-no" id="noBtn" type="button">
+              Todavía no 🙈
+            </button>
+          </div>
+
+          <p class="hint" id="hint">
+            Elige sabiamente. 👀
+          </p>
+        </div>
+
+        <div class="success" id="success" aria-hidden="true">
+          <div class="success-icon">✓</div>
+          <p class="question-label">Excelente decisión</p>
+          <h2>Creo que podríamos<br><em>trabajar en algo increíble. 🤩</em></h2>
+          <p class="success-copy">
+            Gracias por llegar hasta aquí y darme luz verde.<br>
+            ¿Cuándo empiezo?
+          </p>
+
+          <div class="links">
+            <a href="https://wa.me/4427764105?text=%C2%A1Hola%20Diana!%20%F0%9F%91%8B%20Mi%20respuesta%20fue%20un%20%E2%80%9Cs%C3%AD%E2%80%9D%2C%20as%C3%AD%20que%20aqu%C3%AD%20estoy%20%F0%9F%98%84" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              class="contact-link">
+              <span>WhatsApp</span><span>↗</span>
+            </a>
+          </div>
+
+          <p class="ps">
+            P.D. Sí, esto era una excusa para preguntarte por una oportunidad. 😌
+          </p>
+        </div>
+      </div>
+
+      <footer>
+        <span>Made with curiosity &amp; fun.</span>
+        <span>♥</span>
+      </footer>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
 </body>
-</html>
-    <!-- You're welcome to edit, reproduce and change this template as long as original contributation stays present on the website at all times.  -->
-</body>
-
 </html>
