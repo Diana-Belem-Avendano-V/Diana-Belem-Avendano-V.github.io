@@ -4,6 +4,7 @@ const buttonsArea = document.getElementById("buttonsArea");
 const questionWrap = document.getElementById("questionWrap");
 const success = document.getElementById("success");
 const hint = document.getElementById("hint");
+const card = document.getElementById("card");
 
 let escapeCount = 0;
 let lastEscape = 0;
@@ -120,6 +121,18 @@ function escapeButton() {
   const padding = 15;
 
   // =======================================================
+  // LÍMITES VISIBLES (la card recorta con overflow: hidden,
+  // así que el botón no puede salir de su área ni de la ventana)
+  // =======================================================
+
+  const cardRect = card.getBoundingClientRect();
+
+  const minX = Math.max(padding, cardRect.left + padding);
+  const maxX = Math.min(window.innerWidth - padding, cardRect.right - padding);
+  const minY = Math.max(padding, cardRect.top + padding);
+  const maxY = Math.min(window.innerHeight - padding, cardRect.bottom - padding);
+
+  // =======================================================
   // POSICIÓN ACTUAL DEL BOTÓN
   // =======================================================
 
@@ -148,46 +161,34 @@ function escapeButton() {
   // LÍMITE IZQUIERDO
   // =======================================================
 
-  if (nextLeft < padding) {
-    moveX = padding - currentLeft;
+  if (nextLeft < minX) {
+    moveX = minX - currentLeft;
+    nextLeft = currentLeft + moveX;
   }
 
   // =======================================================
   // LÍMITE DERECHO
   // =======================================================
 
-  if (
-    nextLeft + rect.width >
-    window.innerWidth - padding
-  ) {
-    moveX =
-      window.innerWidth -
-      padding -
-      rect.width -
-      currentLeft;
+  if (nextLeft + rect.width > maxX) {
+    moveX = maxX - rect.width - currentLeft;
   }
 
   // =======================================================
   // LÍMITE SUPERIOR
   // =======================================================
 
-  if (nextTop < padding) {
-    moveY = padding - currentTop;
+  if (nextTop < minY) {
+    moveY = minY - currentTop;
+    nextTop = currentTop + moveY;
   }
 
   // =======================================================
   // LÍMITE INFERIOR
   // =======================================================
 
-  if (
-    nextTop + rect.height >
-    window.innerHeight - padding
-  ) {
-    moveY =
-      window.innerHeight -
-      padding -
-      rect.height -
-      currentTop;
+  if (nextTop + rect.height > maxY) {
+    moveY = maxY - rect.height - currentTop;
   }
 
   // =======================================================
