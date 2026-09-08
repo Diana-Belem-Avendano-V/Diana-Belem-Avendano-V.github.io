@@ -11,6 +11,10 @@ let mouseX = 0;
 let mouseY = 0;
 let touchMode = false;
 
+// Desplazamiento acumulado del botón
+let noOffsetX = 0;
+let noOffsetY = 0;
+
 const messages = [
   "Elige sabiamente. 👀",
   "Hmm... esa respuesta no parece estar disponible.",
@@ -23,19 +27,31 @@ const messages = [
   "Última oportunidad... para elegir el correcto. 🚀"
 ];
 
+
+// =========================================================
+// MOUSE
+// =========================================================
+
 document.addEventListener("mousemove", (event) => {
   mouseX = event.clientX;
   mouseY = event.clientY;
 
   if (!touchMode && Date.now() - lastEscape > 300) {
     const rect = noBtn.getBoundingClientRect();
+
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
 
-    const distance = Math.hypot(mouseX - centerX, mouseY - centerY);
+    const distance = Math.hypot(
+      mouseX - centerX,
+      mouseY - centerY
+    );
 
-    // The closer the cursor gets, the earlier the button escapes.
-    const escapeRadius = Math.max(82 - escapeCount * 3, 48);
+    // Qué tan cerca debe estar el mouse para que escape
+    const escapeRadius = Math.max(
+      82 - escapeCount * 3,
+      48
+    );
 
     if (distance < escapeRadius) {
       escapeButton();
@@ -43,71 +59,157 @@ document.addEventListener("mousemove", (event) => {
   }
 });
 
+
+// =========================================================
+// MOUSE ENTER
+// =========================================================
+
 noBtn.addEventListener("mouseenter", () => {
-  if (!touchMode) escapeButton();
+  if (!touchMode) {
+    escapeButton();
+  }
 });
 
-// Mobile: don't make the button impossible to tap accidentally.
-// Instead, when touched, move it and show the joke.
-noBtn.addEventListener("touchstart", (event) => {
-  event.preventDefault();
-  touchMode = true;
-  escapeButton();
-}, { passive: false });
+
+// =========================================================
+// MOBILE / TOUCH
+// =========================================================
+
+noBtn.addEventListener(
+  "touchstart",
+  (event) => {
+    event.preventDefault();
+
+    touchMode = true;
+
+    escapeButton();
+  },
+  { passive: false }
+);
+
+
+// =========================================================
+// CLICK
+// =========================================================
 
 noBtn.addEventListener("click", (event) => {
   event.preventDefault();
+
   escapeButton();
 });
 
-let noOffsetX = 0;
-let noOffsetY = 0;
+
+// =========================================================
+// ESCAPE BUTTON
+// =========================================================
 
 function escapeButton() {
   const now = Date.now();
 
+  // Evita que se mueva demasiadas veces seguidas
   if (now - lastEscape < 300) return;
 
   lastEscape = now;
   escapeCount++;
 
+  // =======================================================
+  // CONFIGURACIÓN
+  // =======================================================
+
   const moveDistance = 50;
-  const padding = 12;
+  const padding = 15;
+
+  // =======================================================
+  // POSICIÓN ACTUAL DEL BOTÓN
+  // =======================================================
 
   const rect = noBtn.getBoundingClientRect();
+
+  const currentLeft = rect.left;
+  const currentTop = rect.top;
+
+  // =======================================================
+  // DIRECCIÓN ALEATORIA
+  // =======================================================
 
   const angle = Math.random() * Math.PI * 2;
 
   let moveX = Math.cos(angle) * moveDistance;
   let moveY = Math.sin(angle) * moveDistance;
 
-  // Posición que tendría después de moverse
-  let newLeft = rect.left + moveX;
-  let newTop = rect.top + moveY;
+  // =======================================================
+  // POSICIÓN QUE TENDRÍA DESPUÉS DEL MOVIMIENTO
+  // =======================================================
 
-  // Mantener dentro de la pantalla
-  if (newLeft < padding) {
-    moveX = padding - rect.left;
+  let nextLeft = currentLeft + moveX;
+  let nextTop = currentTop + moveY;
+
+  // =======================================================
+  // LÍMITE IZQUIERDO
+  // =======================================================
+
+  if (nextLeft < padding) {
+    moveX = padding - currentLeft;
   }
 
-  if (newLeft + rect.width > window.innerWidth - padding) {
-    moveX = window.innerWidth - padding - rect.width - rect.left;
+  // =======================================================
+  // LÍMITE DERECHO
+  // =======================================================
+
+  if (
+    nextLeft + rect.width >
+    window.innerWidth - padding
+  ) {
+    moveX =
+      window.innerWidth -
+      padding -
+      rect.width -
+      currentLeft;
   }
 
-  if (newTop < padding) {
-    moveY = padding - rect.top;
+  // =======================================================
+  // LÍMITE SUPERIOR
+  // =======================================================
+
+  if (nextTop < padding) {
+    moveY = padding - currentTop;
   }
 
-  if (newTop + rect.height > window.innerHeight - padding) {
-    moveY = window.innerHeight - padding - rect.height - rect.top;
+  // =======================================================
+  // LÍMITE INFERIOR
+  // =======================================================
+
+  if (
+    nextTop + rect.height >
+    window.innerHeight - padding
+  ) {
+    moveY =
+      window.innerHeight -
+      padding -
+      rect.height -
+      currentTop;
   }
 
-  // Acumular el desplazamiento
+  // =======================================================
+  // ACUMULAR DESPLAZAMIENTO
+  // =======================================================
+
   noOffsetX += moveX;
   noOffsetY += moveY;
 
+  // =======================================================
+  // APLICAR MOVIMIENTO
+  // =======================================================
+
+  noBtn.classList.add("escaping");
+
   noBtn.style.transform =
-    `translate(${noOffsetX}px, ${noOffsetY}px)`;
+    `translate3d(${noOffsetX}px, ${noOffsetY}px, 0)`;
+
+
+  // =======================================================
+  // MENSAJES
+  // =======================================================
 
   const messageIndex = Math.min(
     escapeCount,
@@ -115,6 +217,11 @@ function escapeButton() {
   );
 
   hint.textContent = messages[messageIndex];
+
+
+  // =======================================================
+  // MENSAJES ESPECIALES
+  // =======================================================
 
   if (escapeCount === 6) {
     hint.textContent =
@@ -127,77 +234,151 @@ function escapeButton() {
   }
 }
 
+
+// =========================================================
+// RANDOM
+// =========================================================
+
+function random(min, max) {
+  return Math.floor(
+    Math.random() * (max - min + 1)
+  ) + min;
+}
+
+
+// =========================================================
+// DISTANCE TO ELEMENT
+// =========================================================
+
+function distanceToElement(
+  x,
+  y,
+  width,
+  height,
+  element
+) {
+  const target = element.getBoundingClientRect();
+
+  const targetX =
+    target.left + target.width / 2;
+
+  const targetY =
+    target.top + target.height / 2;
+
+  return Math.hypot(
+    x + width / 2 - targetX,
+    y + height / 2 - targetY
+  );
+}
+
+
+// =========================================================
+// YES BUTTON
+// =========================================================
+
 yesBtn.addEventListener("click", () => {
-  // Hide the question and show the final state.
+
+  // Ocultar la pregunta
   questionWrap.style.display = "none";
 
+  // Ocultar botón NO
   noBtn.style.display = "none";
 
-  success.setAttribute("aria-hidden", "false");
+  // Mostrar éxito
+  success.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
   success.classList.add("show");
 
-  // Small celebration without an external library.
+  // Celebración
   createParticles();
 });
+
+
+// =========================================================
+// PARTICLES
+// =========================================================
 
 function createParticles() {
   const count = 26;
 
   for (let i = 0; i < count; i++) {
-    const particle = document.createElement("span");
+
+    const particle =
+      document.createElement("span");
 
     particle.style.position = "fixed";
-    particle.style.left = `${50 + random(-15, 15)}%`;
-    particle.style.top = `${48 + random(-5, 5)}%`;
-    particle.style.width = `${random(2, 5)}px`;
-    particle.style.height = particle.style.width;
-    particle.style.borderRadius = "50%";
-    particle.style.background = "rgba(183,175,255,.85)";
-    particle.style.pointerEvents = "none";
+
+    particle.style.left =
+      `${50 + random(-15, 15)}%`;
+
+    particle.style.top =
+      `${48 + random(-5, 5)}%`;
+
+    particle.style.width =
+      `${random(2, 5)}px`;
+
+    particle.style.height =
+      particle.style.width;
+
+    particle.style.borderRadius =
+      "50%";
+
+    particle.style.background =
+      "rgba(183,175,255,.85)";
+
+    particle.style.pointerEvents =
+      "none";
+
     particle.style.zIndex = "50";
 
     document.body.appendChild(particle);
 
-    const angle = Math.random() * Math.PI * 2;
-    const distance = random(80, 240);
-    const x = Math.cos(angle) * distance;
-    const y = Math.sin(angle) * distance;
 
+    // Dirección de la partícula
+    const angle =
+      Math.random() * Math.PI * 2;
+
+    const distance =
+      random(80, 240);
+
+    const x =
+      Math.cos(angle) * distance;
+
+    const y =
+      Math.sin(angle) * distance;
+
+
+    // Animación
     particle.animate(
       [
         {
-          transform: "translate(-50%, -50%) scale(1)",
+          transform:
+            "translate(-50%, -50%) scale(1)",
+
           opacity: 1
         },
+
         {
-          transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(0)`,
+          transform:
+            `translate(
+              calc(-50% + ${x}px),
+              calc(-50% + ${y}px)
+            ) scale(0)`,
+
           opacity: 0
         }
       ],
       {
         duration: random(700, 1200),
-        easing: "cubic-bezier(.2,.8,.2,1)"
+
+        easing:
+          "cubic-bezier(.2,.8,.2,1)"
       }
-    ).onfinish = () => particle.remove();
+    ).onfinish = () => {
+      particle.remove();
+    };
   }
 }
-
-// If the window changes size, bring the runaway button back into view.
-window.addEventListener("resize", () => {
-  if (!noBtn.classList.contains("escaping")) return;
-
-  const rect = noBtn.getBoundingClientRect();
-
-  const x = Math.min(
-    Math.max(12, rect.left),
-    window.innerWidth - rect.width - 12
-  );
-
-  const y = Math.min(
-    Math.max(12, rect.top),
-    window.innerHeight - rect.height - 12
-  );
-
-  noBtn.style.left = `${x}px`;
-  noBtn.style.top = `${y}px`;
-});
