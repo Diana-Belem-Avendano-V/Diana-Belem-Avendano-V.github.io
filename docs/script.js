@@ -71,16 +71,40 @@ function escapeButton() {
   lastEscape = now;
   escapeCount++;
 
-  const moveDistance = 75;
+  const moveDistance = 50;
+  const padding = 12;
+
+  const rect = noBtn.getBoundingClientRect();
 
   const angle = Math.random() * Math.PI * 2;
 
-  noOffsetX += Math.cos(angle) * moveDistance;
-  noOffsetY += Math.sin(angle) * moveDistance;
+  let moveX = Math.cos(angle) * moveDistance;
+  let moveY = Math.sin(angle) * moveDistance;
 
-  // Evitar que se vaya demasiado lejos
-  noOffsetX = Math.max(-80, Math.min(80, noOffsetX));
-  noOffsetY = Math.max(-50, Math.min(50, noOffsetY));
+  // Posición que tendría después de moverse
+  let newLeft = rect.left + moveX;
+  let newTop = rect.top + moveY;
+
+  // Mantener dentro de la pantalla
+  if (newLeft < padding) {
+    moveX = padding - rect.left;
+  }
+
+  if (newLeft + rect.width > window.innerWidth - padding) {
+    moveX = window.innerWidth - padding - rect.width - rect.left;
+  }
+
+  if (newTop < padding) {
+    moveY = padding - rect.top;
+  }
+
+  if (newTop + rect.height > window.innerHeight - padding) {
+    moveY = window.innerHeight - padding - rect.height - rect.top;
+  }
+
+  // Acumular el desplazamiento
+  noOffsetX += moveX;
+  noOffsetY += moveY;
 
   noBtn.style.transform =
     `translate(${noOffsetX}px, ${noOffsetY}px)`;
@@ -101,21 +125,6 @@ function escapeButton() {
     hint.textContent =
       "Aceptémoslo: la única respuesta razonable es la otra. 🚀";
   }
-}
-
-function random(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function distanceToElement(x, y, width, height, element) {
-  const target = element.getBoundingClientRect();
-  const targetX = target.left + target.width / 2;
-  const targetY = target.top + target.height / 2;
-
-  return Math.hypot(
-    x + width / 2 - targetX,
-    y + height / 2 - targetY
-  );
 }
 
 yesBtn.addEventListener("click", () => {
